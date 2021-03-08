@@ -15,12 +15,15 @@
         "ejs": "^3.1.6",
         "express": "^4.17.1",
         "express-handlebars": "^5.2.1",
+        "mongodb": "^3.6.4",
+        "mongoose": "^5.11.18",
         "mysql2": "^2.2.5",
         "pug": "^3.0.0",
         "sequelize": "^6.5.0",
         "socket.io": "^3.1.1"
     },
     "devDependencies": {
+        "@types/node": "^14.14.31",
         "nodemon": "^2.0.7"
     }
 }
