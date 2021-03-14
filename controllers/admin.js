@@ -2,6 +2,7 @@ const Product = require('../models/product');
 
 exports.getAddProduct = (req, res, next) => {
     // res.sendFile(path.join(rootDir, 'views', 'add-product.html'))
+
     res.render('admin/edit-product', {
         pageTitle: 'Add Product',
         path: '/admin/add-product',
@@ -46,6 +47,7 @@ exports.getEditProduct = (req, res, next) => {
                 path: '/admin/edit-product',
                 editing: editMode,
                 product: product
+
             })
         }).catch(err => {
             console.log(err)
@@ -81,7 +83,10 @@ exports.postEditProduct = (req, res, next) => {
 
 exports.postDeleteProduct = (req, res, next) => {
     const productId = req.body.productId;
-    Product.findByIdAndRemove(productId)
+    Product.findById(productId)
+        .then(product => {
+            return product.remove();
+        })
         .then((result) => {
             console.log('DESTROYED PRODUCT')
             res.redirect('/admin/products')
@@ -98,11 +103,12 @@ exports.getProducts = (req, res, next) => {
         // .select('title price -_id')
         // .populate('userId', 'name')
         .then(products => {
-            console.log(products)
+        
             res.render('admin/products', {
                 prods: products,
                 path: '/admin/products',
                 pageTitle: 'Admin Products'
+
             })
         })
         .catch(err => {

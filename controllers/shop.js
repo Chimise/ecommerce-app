@@ -6,7 +6,7 @@ exports.getProducts = (req, res, next) => {
     // console.log('shop.js', products)
     // res.sendFile(path.join(rootDir, 'views', 'shop.html'));
     Product.find().then(products => {
-        console.log(products)
+        
         res.render('shop/product-list', {
             prods: products,
             pageTitle: 'All Products',
@@ -46,6 +46,7 @@ exports.getIndex = (req, res, next) => {
             prods: products,
             path: '/',
             pageTitle: 'Shop'
+            
         });
     }).catch(err => {
         console.log(err)
@@ -60,11 +61,12 @@ exports.getCart = (req, res, next) => {
     .populate('cart.items.productId')
     .execPopulate()
     .then(user => {
-        const products = user.cart.items
+        const products = user.cart.items;
             res.render('shop/cart', {
                     path: '/cart',
                     pageTitle: 'Your Cart',
                     products: products
+
             })
         }).catch(err => console.log(err))
 
@@ -96,7 +98,7 @@ exports.postOrder = (req, res, next) => {
         })
         const order = new Order({
             user: {
-                name: req.user.name,
+                email: req.user.email,
                 userId: req.user
             },
             products: products
