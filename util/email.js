@@ -1,12 +1,5 @@
-const express = require('express');
+
 const nodemailer = require('nodemailer');
-
-const app = express();
-const port = 3000;
-
-app.get('/', (req, res) => {
-    res.send('<h1>Welcome to nodemailer project</h1>');
-})
 
 let transporter = nodemailer.createTransport({
     service: 'gmail',
@@ -23,25 +16,23 @@ let transporter = nodemailer.createTransport({
     }
 })
 
+module.exports = transporter;
 
-let mailOptions = {
-    from: 'chimisepro@gmail.com',
-    to: 'chimisepro@gmail.com',
-    subject: 'Nodemailer Project',
-    text: 'Hi from your nodemailer project',
-    html: '<h2>Hi from your nodemailer project</h2> <br> <p>I will love to meet you</p>'
+// let mailOptions = {
+//     from: 'chimisepro@gmail.com',
+//     to: 'chimisepro@gmail.com',
+//     subject: 'Nodemailer Project',
+//     text: 'Hi from your nodemailer project',
+//     html: '<h2>Hi from your nodemailer project</h2> <br> <p>I will love to meet you</p>'
 
-}
+// }
 
-transporter.sendMail(mailOptions, function(err, data) {
-    if (err) {
-        console.log('Error: ' + err)
-    } else {
-        console.log(data)
-        console.log('Email sent sucessfully')
-    }
-})
+// transporter.sendMail(mailOptions, function(err, data) {
+//     if (err) {
+//         console.log('Error: ' + err)
+//     } else {
+//         console.log(data)
+//         console.log('Email sent sucessfully')
+//     }
+// })
 
-app.listen(port, () => {
-    console.log('App running on port ' + port);
-})

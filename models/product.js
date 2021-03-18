@@ -1,9 +1,9 @@
-const mongoose = require('mongoose');
-const User = require('./user');
+const mongoose = require( 'mongoose' );
+const User = require( './user' );
 
 const Schema = mongoose.Schema;
 
-const productSchema = new Schema({
+const productSchema = new Schema( {
     title: {
         type: String,
         required: true
@@ -19,7 +19,7 @@ const productSchema = new Schema({
     imageUrl: {
         type: String,
         required: true
-    }, 
+    },
     userId: {
         type: Schema.Types.ObjectId,
         ref: 'User',
@@ -27,29 +27,30 @@ const productSchema = new Schema({
     }
 
 
-})
+} )
 
-productSchema.pre('remove', function(next) {
-    User.find({'cart.items.productId': this._id})
-        .then(users => {
-            users.forEach(user => {
-                user.cart.items = user.cart.items.filter(item => {
+productSchema.pre( 'remove', function ( next ) {
+    User.find( {
+            'cart.items.productId': this._id
+        } )
+        .then( users => {
+            if ( users.length === 0 ) {
+                return next()
+            }
+            users.forEach( user => {
+                user.cart.items = user.cart.items.filter( item => {
                     return item.productId.toString() !== this._id.toString();
-                })
+                } )
 
-                user.save().then(() => {
-                    console.log('user cart updated')
-                    next();
-                })
-                .catch(err => console.log(err))
+                user.save().then( () => {
+                        console.log( 'user cart updated' )
+                        next();
+                    } )
+                    .catch( err => console.log( err ) )
 
-            })
-            })
-        .catch(err => console.log(err))
-})
+            } )
+        } )
+        .catch( err => console.log( err ) )
+} )
 
-module.exports = mongoose.model('Product', productSchema);
-
-
-
-
+module.exports = mongoose.model( 'Product', productSchema );
