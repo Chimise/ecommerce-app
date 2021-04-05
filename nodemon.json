@@ -1,0 +1,6 @@
+{
+    "env": {
+        "MONGO_URL": "127.0.0.1:27017",
+        "MONGO_DEFAULT_DATABASE": "shop"
+    }
+}

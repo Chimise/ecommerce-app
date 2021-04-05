@@ -1,4 +1,6 @@
 const path = require( 'path' );
+const fs = require('fs');
+const https = require('https');
 
 
 const express = require( 'express' );
@@ -9,6 +11,9 @@ const MongoDBStore = require( 'connect-mongodb-session' )( session );
 const csrf = require( 'csurf' );
 const flash = require( 'connect-flash' );
 const multer = require( 'multer' );
+const helmet = require('helmet');
+const compression = require('compression');
+const morgan = require('morgan');
 
 const adminRoutes = require( './routes/admin' );
 const shopRoutes = require( './routes/shop' );
@@ -16,9 +21,9 @@ const authRoutes = require( './routes/auth' );
 const errorController = require( './controllers/error' )
 const User = require( './models/user' );
 
+console.log(process.env.NODE_ENV);
 
-const MONGODB_URL = 'mongodb://127.0.0.1:27017/shop';
-
+const MONGODB_URL = `mongodb://${process.env.MONGO_URL}/${process.env.MONGO_DEFAULT_DATABASE}`
 
 
 
@@ -30,6 +35,9 @@ const store = new MongoDBStore( {
 
 } )
 const csrfProtection = csrf();
+
+const privateKey = fs.readFileSync('server.key');
+const certificate = fs.readFileSync('server.cert')
 
 const fileStorage = multer.diskStorage( {
     destination: ( req, file, cb ) => {
@@ -52,7 +60,11 @@ const fileFilter = ( req, file, cb ) => {
 app.set( 'view engine', 'ejs' );
 app.set( 'views', path.join( __dirname, 'views' ) );
 
+const accessLogStream = fs.createWriteStream(path.join(__dirname, 'access.log'), {flags: 'a'});
 
+app.use(helmet());
+app.use(compression())
+app.use(morgan('combined', {stream: accessLogStream}));
 
 app.use( bodyParser.urlencoded( {
     extended: false
@@ -128,7 +140,10 @@ mongoose.connect( MONGODB_URL, {
         useCreateIndex: true
     } )
     .then( () => {
-        app.listen( 3000, () => console.log( 'Server is listening at port 3000' ) );
+        // https.createServer({key: privateKey, cert: certificate},app).listen( process.env.PORT || 3000, () => console.log( 'Server is listening at port 3000' ) );
+        app.listen(process.env.PORT || 3000, () => {
+            console.log('Server is listening at port 3000')
+        })
     } )
     .catch( err => {
         console.log( err );

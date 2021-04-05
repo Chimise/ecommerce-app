@@ -2,3 +2,5 @@ node_modules
 .vscode
 Playground
 error-playground.js
+server.cert
+server.key

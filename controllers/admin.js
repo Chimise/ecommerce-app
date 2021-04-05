@@ -1,6 +1,9 @@
 const {
     validationResult
-} = require( 'express-validator' )
+} = require( 'express-validator' );
+
+
+
 
 const Product = require( '../models/product' );
 const fileHelper = require( '../util/file' );
@@ -46,7 +49,9 @@ exports.postAddProduct = ( req, res, next ) => {
     }
 
     const errors = validationResult( req );
+
     if ( !errors.isEmpty() ) {
+        console.log( errors.array() )
         return res.status( 422 ).render( 'admin/edit-product', {
             pageTitle: 'Add Product',
             path: '/admin/add-product',
@@ -54,7 +59,6 @@ exports.postAddProduct = ( req, res, next ) => {
             hasError: true,
             product: {
                 title: title,
-                imageUrl: imageUrl,
                 price: price,
                 description: description
             },
@@ -80,7 +84,7 @@ exports.postAddProduct = ( req, res, next ) => {
             res.redirect( '/admin/products' )
         } )
         .catch( err => {
-            const error = new Error( err );
+            console.log( err )
             error.httpStatusCode = 500;
             return next( error );
         } );
@@ -177,27 +181,28 @@ exports.postEditProduct = ( req, res, next ) => {
 
 }
 
-exports.postDeleteProduct = ( req, res, next ) => {
-    const productId = req.body.productId;
+exports.deleteProduct = ( req, res, next ) => {
+    const productId = req.params.productId;
     Product.findById( productId )
         .then( product => {
             if ( !product ) {
                 return next( new Error( 'Product not found' ) );
             }
             if ( product.userId.toString() !== req.user._id.toString() ) {
-                return res.redirect( '/' )
+                return next( new Error( 'User not authenticated' ) )
             }
             fileHelper( product.imageUrl );
             return product.remove()
                 .then( ( result ) => {
                     console.log( 'DESTROYED PRODUCT' )
-                    res.redirect( '/admin/products' )
+                    res.status( 200 ).json( {
+                        message: 'Success'
+                    } )
                 } )
                 .catch( err => {
-                    console.log( err )
-                    const error = new Error( err );
-                    error.httpStatusCode = 500;
-                    return next( error );
+                    res.status( 500 ).json( {
+                        message: 'Deleting product failed'
+                    } )
                 } )
         } )
         .catch( err => {
